@@ -2,14 +2,6 @@ import time
 
 import numpy as np
 from scipy import integrate
-from reactorPhysics import reactorSystem
-from reactorPhysics import qFuel
-from reactorPhysics import rho
-import reactorPhysics
-from reactorPhysics import N235_0, N238_0, N239Pu_0, NFP_0
-from reactorPhysics import beta_i, lambda_i, Lamb, S_source, beta
-#import matplotlib.pyplot as pl
-import time
 
 from .reactorPhysics import (
     N235_0,

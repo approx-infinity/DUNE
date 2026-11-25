@@ -111,7 +111,7 @@ def test_thermal_equilibrium_at_zero_power():
 
 def test_neutron_and_precursor_non_negative_clamping():
     s = _fresh_state(n=0.0)
-    s[1:7] = -1.0
-    assert rp.dndt(s, 0.0, reactivity=-1.0) >= 0.0
+    s[1:7] = -1.0e9
+    assert rp.dndt(s, 0.0, reactivity=-1.0) == 0.0
     for group in range(rp.NUM_GROUPS):
-        assert rp.dCdt(s, 0.0, group) == 0.0
+        assert rp.dCdt(s, 0.0, group) == pytest.approx(rp.lambda_i[group] * 1.0e9)

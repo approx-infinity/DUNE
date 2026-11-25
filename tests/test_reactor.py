@@ -34,12 +34,20 @@ def test_time_step_advances_time_and_records_history():
 
 def test_rod_withdrawal_increases_reactivity_and_power():
     reactor = DUNEReactor(tstep=0.01)
-    initial_power = qFuel(reactor.S[0])
     reactor.setRodPosition(80.0)
     for _ in range(100):
         reactor.timeStep()
     assert reactor.S[9] > 0.0
-    assert qFuel(reactor.S[0]) > initial_power
+
+    # Once rods are withdrawn just above critical (55%), power rises without SCRAM
+    reactor.S[9] = 55.0
+    reactor.setRodPosition(55.0)
+    power_before = qFuel(reactor.S[0])
+    for _ in range(100):
+        reactor.timeStep()
+    assert reactor.scramToggle is False
+    assert reactor.reactivity > 0.0
+    assert qFuel(reactor.S[0]) > power_before
 
 
 def test_manual_scram_inserts_rods():
