@@ -391,8 +391,11 @@ def intRodWorth(h1, h2):
     Total worth: $0.1 from fully inserted to fully withdrawn
     """
     scalingFac = ROD_WORTH_SCALING * 1.e-5 / beta
-    integral = lambda h: -100.0 * scalingFac * (100.0 / np.pi) * np.cos(np.pi * h / 100.0)
-    return (integral(h2) - integral(h1))
+
+    def integral(h):
+        return -100.0 * scalingFac * (100.0 / np.pi) * np.cos(np.pi * h / 100.0)
+
+    return integral(h2) - integral(h1)
 
 
 def rho(S, t, hrate, deltaT):

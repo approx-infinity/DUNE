@@ -1,2 +1,0 @@
-[console_scripts]
-DUNE = DUNEReactor:main

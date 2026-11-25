@@ -1,4 +1,0 @@
-DUNEReactor
-guiTemplate
-reactor
-reactorPhysics

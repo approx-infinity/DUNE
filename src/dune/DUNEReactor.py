@@ -11,24 +11,24 @@
 # 1/09/2025     Creation.
 #
 
-import time
-import sys
 import csv
 import os
+import sys
+import time
 from datetime import datetime
-from distutils.version import LooseVersion
+
+import matplotlib
 import numpy as np
 import wx
-import reactor as rct
-from reactorPhysics import qFuel
-import guiTemplate as gui
-import matplotlib
+
+from . import guiTemplate as gui
+from . import reactor as rct
+from .reactorPhysics import qFuel
+
 matplotlib.use('WXAgg')
+from matplotlib import pyplot as plt
+from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigCanvas
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_wxagg import \
-    FigureCanvasWxAgg as FigCanvas
-#    NavigationToolbar2WxAgg as NavigationToolbar
-import pylab
 
 
 # Stupid fix for stupid problem
@@ -130,38 +130,19 @@ class CalcFrame(gui.MyFrame1):
         self.axes_u238 = self.fig.add_subplot(gs[2, 4:6])  # U-238
         self.axes_pu239 = self.fig.add_subplot(gs[2, 6:8])  # Pu-239 and FP
         
-        if LooseVersion(matplotlib.__version__) >= LooseVersion('2.0.0'):
-            self.axes1.set_facecolor('white')
-            self.axes4.set_facecolor('white')
-            self.axes5.set_facecolor('white')
-            self.axes6.set_facecolor('white')
-            self.axes_u235.set_facecolor('white')
-            self.axes_u238.set_facecolor('white')
-            self.axes_pu239.set_facecolor('white')
-        else:
-            self.axes1.set_axis_bgcolor('white')
-            self.axes4.set_axis_bgcolor('white')
-            self.axes5.set_axis_bgcolor('white')
-            self.axes6.set_axis_bgcolor('white')
-            self.axes_u235.set_axis_bgcolor('white')
-            self.axes_u238.set_axis_bgcolor('white')
-            self.axes_pu239.set_axis_bgcolor('white')
+        for ax in (
+            self.axes1,
+            self.axes4,
+            self.axes5,
+            self.axes6,
+            self.axes_u235,
+            self.axes_u238,
+            self.axes_pu239,
+        ):
+            ax.set_facecolor('white')
+            plt.setp(ax.get_xticklabels(), fontsize=8)
+            plt.setp(ax.get_yticklabels(), fontsize=8)
         self.axes1.set_title('Reactor Power [MW] Trace', size=12)
-
-        pylab.setp(self.axes1.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes1.get_yticklabels(), fontsize=8)
-        pylab.setp(self.axes4.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes4.get_yticklabels(), fontsize=8)
-        pylab.setp(self.axes5.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes5.get_yticklabels(), fontsize=8)
-        pylab.setp(self.axes6.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes6.get_yticklabels(), fontsize=8)
-        pylab.setp(self.axes_u235.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes_u235.get_yticklabels(), fontsize=8)
-        pylab.setp(self.axes_u238.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes_u238.get_yticklabels(), fontsize=8)
-        pylab.setp(self.axes_pu239.get_xticklabels(), fontsize=8)
-        pylab.setp(self.axes_pu239.get_yticklabels(), fontsize=8)
 
     def draw_plot(self):
         # Determine plot data length depending on zoom lvl
@@ -215,8 +196,8 @@ class CalcFrame(gui.MyFrame1):
         self.axes3.set_ylabel('Coolant Temperature [K]')
         self.axes3.yaxis.set_label_position('right')
         self.axes3.yaxis.tick_right()
-        fuelPlot, = self.axes2.plot(xdata, fuelTdata, color='r', linewidth=2, label='Fuel T')
-        coolPlot, = self.axes3.plot(xdata, coolTdata, color='b', linewidth=2, label='Coolant T')
+        self.axes2.plot(xdata, fuelTdata, color='r', linewidth=2, label='Fuel T')
+        self.axes3.plot(xdata, coolTdata, color='b', linewidth=2, label='Coolant T')
         handles, labels = self.axes2.get_legend_handles_labels()
         self.axes2.legend(handles, labels, loc=2)
         handles, labels = self.axes3.get_legend_handles_labels()
@@ -226,8 +207,8 @@ class CalcFrame(gui.MyFrame1):
         self.axes5.set_title('Fission Product Poisons', size=12)
         self.axes5.set_ylabel('Concentration [atoms/cm³]')
         self.axes5.set_xlabel('time [s]')
-        xenonPlot, = self.axes5.plot(xdata, xenondata, color='purple', linewidth=2, label='Xe-135')
-        samariumPlot, = self.axes5.plot(xdata, samariumdata, color='orange', linewidth=2, label='Sm-149')
+        self.axes5.plot(xdata, xenondata, color='purple', linewidth=2, label='Xe-135')
+        self.axes5.plot(xdata, samariumdata, color='orange', linewidth=2, label='Sm-149')
         self.axes5.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
         self.axes5.legend(loc='best', fontsize=9)
         
@@ -492,9 +473,9 @@ def initSerial():
             ser = None
     if not ser:
         print("Arduino Not Detected.  Running without serial connection")
-    else:
-        print("Connection to Arduino Established on " + ser.port)
-        return ser
+        return None
+    print("Connection to Arduino Established on " + ser.port)
+    return ser
 
 
 
